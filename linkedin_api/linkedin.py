@@ -164,10 +164,10 @@ class Linkedin(object):
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["status"]))
             return {}
-        while data and data["metadata"]["paginationToken"] != "":
+        while data and data.get("metadata", {}).get("paginationToken", "") != "":
             if len(data["elements"]) >= comment_count:
                 break
-            pagination_token = data.get("metadata", {}).get("paginationToken", {})
+            pagination_token = data["metadata"]["paginationToken"]
             url_params["start"] = url_params["start"] + self._MAX_POST_COUNT
             url_params["count"] = self._MAX_POST_COUNT
             url_params["paginationToken"] = pagination_token
