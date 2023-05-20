@@ -157,14 +157,14 @@ class Linkedin(object):
             "q": "comments",
             "sortOrder": "RELEVANCE",
         }
-        url = f"/feed/comments"
+        url = "/feed/comments"
         url_params["updateId"] = "activity:" + post_urn
         res = self._fetch(url, params=url_params)
         data = res.json()
         if data and "status" in data and data["status"] != 200:
             self.logger.info("request failed: {}".format(data["status"]))
             return {}
-        while data and data.get("metadata", {}).get("paginationToken", "") != "":
+        while data.get("elements") and data.get("metadata", {}).get("paginationToken", "") != "":
             if len(data["elements"]) >= comment_count:
                 break
             pagination_token = data["metadata"]["paginationToken"]
@@ -176,7 +176,7 @@ class Linkedin(object):
                 self.logger.info("request failed: {}".format(data["status"]))
                 return {}
             data["metadata"] = res.json()["metadata"]
-            """ When the number of comments exceed total available 
+            """ When the number of comments exceed total available
             comments, the api starts returning an empty list of elements"""
             if res.json()["elements"] and len(res.json()["elements"]) == 0:
                 break
